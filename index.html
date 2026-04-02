@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cash Flow - Personal Finance Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- SPLASH SCREEN -->
+  <div id="splashScreen">
+    <div class="splash-logo">💳 Cash Flow</div>
+    <p class="splash-subtitle">Personal Finance Manager</p>
+    <div class="loader"></div>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div id="setupScreen">
+    <div class="form-container">
+      <h2 class="form-title">Welcome to Cash Flow</h2>
+      <p class="form-subtitle">Let's set up your account</p>
+      <div class="error-msg" id="setupError"></div>
+      <form id="setupForm">
+        <div class="form-group">
+          <label>📝 Your Name:</label>
+          <input type="text" id="userName" placeholder="e.g., John Smith" required>
+        </div>
+        <div class="form-group">
+          <label>🔐 Create Password:</label>
+          <input type="password" id="userPass" placeholder="Min 6 characters" required>
+        </div>
+        <div class="form-group">
+          <label>🔐 Confirm Password:</label>
+          <input type="password" id="confirmPass" placeholder="Confirm your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Next: Currency Selection</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CURRENCY SELECTION SCREEN -->
+  <div id="currencyScreen">
+    <div class="form-container">
+      <h2 class="form-title">Currency Selection</h2>
+      <p class="form-subtitle">Choose your primary currency</p>
+      <div class="error-msg" id="currencyError"></div>
+      <form id="currencyForm">
+        <div class="form-group">
+          <label>💵 Preferred Currency:</label>
+          <select id="currencySelect" required>
+            <option value="">-- Select Currency --</option>
+            <option value="৳">🇧🇩 BDT (Bangladeshi Taka)</option>
+            <option value="$">🇺🇸 USD (US Dollar)</option>
+            <option value="€">🇪🇺 EUR (Euro)</option>
+            <option value="£">🇬🇧 GBP (British Pound)</option>
+            <option value="₹">🇮🇳 INR (Indian Rupee)</option>
+            <option value="¥">🇯🇵 JPY (Japanese Yen)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Complete Setup</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
+    <div class="form-container">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="loginTab">Login</button>
+        <button class="auth-tab" id="registerTab">Register</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginFormSection" class="auth-section active">
+        <h2 class="form-title">Account Access</h2>
+        <p class="form-subtitle">Enter your credentials</p>
+        <div class="error-msg" id="loginError"></div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label>👤 Name:</label>
+            <input type="text" id="loginName" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label>🔐 Password:</label>
+            <input type="password" id="loginPass" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerFormSection" class="auth-section">
+        <h2 class="form-title">Create Account</h2>
+        <p class="form-subtitle">Join us today</p>
+        <div class="error-msg" id="registerError"></div>
+        <form id="registerForm">
+          <div class="form-group">
+            <label>👤 Name:</label>
+            <input type="text" id="registerName" placeholder="Choose a name" required>
+          </div>
+          <div class="form-group">
+            <label>🔐 Password:</label>
+            <input type="password" id="registerPass" placeholder="Create password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD SCREEN -->
+  <div id="dashboardScreen">
+    <!-- FLOATING MENU TOGGLE -->
+    <div id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+      <button class="nav-btn active" data-section="home"><i class="fas fa-home"></i> Home</button>
+      <button class="nav-btn" data-section="months"><i class="fas fa-calendar-alt"></i> Month</button>
+      <button class="nav-btn" data-section="settings"><i class="fas fa-cog"></i> Settings</button>
+      <button class="btn btn-secondary" onclick="logout()" style="margin-top: auto;">Logout</button>
+    </div>
+
+    <div class="dashboard-content">
+      <div id="globalSuccess" class="success-msg"></div>
+      <div id="globalError" class="error-msg"></div>
+
+      <!-- HOME SECTION -->
+      <div id="homeSection" class="section-content">
+        <div class="welcome-header">
+          <h1 id="greetingText">Hi User 👋</h1>
+          <p id="dailyQuote" class="quote-text">"The best way to predict your future is to create it."</p>
+        </div>
+      </div>
+
+      <!-- MONTHS LIST SECTION -->
+      <div id="monthsSection" class="section-content" style="display: none;">
+        <div class="month-list-header">
+          <h2 class="section-title">📅 Tracked Months</h2>
+          <p class="section-subtitle">Select a month to view details</p>
+        </div>
+        <div id="monthListContainer" class="months-grid">
+          <!-- Dynamic Month List -->
+        </div>
+      </div>
+
+      <!-- MONTH DETAIL SECTION (Wrapper for the 4 tabs) -->
+      <div id="monthDetailSection" class="section-content" style="display: none;">
+        <div class="month-detail-header">
+          <button id="detailBackBtn" class="detail-back-btn" onclick="navigateTo('months')">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <h2 id="selectedMonthTitle" class="selected-month-title">Month Year</h2>
+          <div class="top-nav">
+            <button class="top-nav-btn active" data-tab="overview">
+              <i class="fas fa-chart-line"></i>
+              <span>Summary</span>
+            </button>
+            <button class="top-nav-btn" data-tab="people">
+              <i class="fas fa-users"></i>
+              <span>People</span>
+            </button>
+            <button class="top-nav-btn" data-tab="transactions">
+              <i class="fas fa-plus-circle"></i>
+              <span>Add</span>
+            </button>
+            <button class="top-nav-btn" data-tab="history">
+              <i class="fas fa-history"></i>
+              <span>History</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="monthTabContent">
+          <!-- OVERVIEW TAB -->
+          <div id="overviewTab" class="tab-content">
+            <div id="personalSub" class="sub-section">
+              <div class="stats-grid">
+                <div class="stat-card clickable" onclick="setSummaryView('income')">
+                  <div class="stat-label">Income</div>
+                  <div class="stat-value income" id="totalIncome">0.00</div>
+                </div>
+                <div class="stat-card clickable" onclick="setSummaryView('expense-overview')">
+                  <div class="stat-label">Expense</div>
+                  <div class="stat-value expense" id="totalAllExpense">0.00</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Net Balance</div>
+                  <div class="stat-value balance" id="totalBalance">0.00</div>
+                </div>
+              </div>
+
+              <!-- Expense Menu (Shown after clicking Expense Card) -->
+              <div id="expenseMenu" class="sub-nav"
+                style="display: none; margin: 20px auto; justify-content: center; width: 100%;">
+                <button class="sub-nav-btn expense-nav-btn" data-view="overview"
+                  onclick="setSummaryView('expense-overview')">Overview</button>
+                <button class="sub-nav-btn expense-nav-btn" data-view="mine"
+                  onclick="setSummaryView('expense-mine')">Mine</button>
+                <button class="sub-nav-btn expense-nav-btn" data-view="person"
+                  onclick="setSummaryView('expense-person')">Person</button>
+              </div>
+
+              <!-- Income Graph Area -->
+              <div id="incomeViewArea" class="summary-view-area" style="display: none;">
+                <div class="chart-container">
+                  <div class="chart-header">
+                    <h3 class="section-title">💰 Income Analysis</h3>
+                    <div class="chart-controls">
+                      <select id="incomeChartType" class="chart-select">
+                        <option value="bar">Bar Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="doughnut">Doughnut Chart</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="chart-wrapper">
+                    <canvas id="incomeChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expense Areas -->
+              <div id="expenseOverviewArea" class="summary-view-area" style="display: none;">
+                <div class="chart-container">
+                  <div class="chart-header">
+                    <h3 class="section-title">📊 Expense Overview</h3>
+                    <div class="chart-controls">
+                      <select id="mainChartType" class="chart-select">
+                        <option value="bar">Bar Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="doughnut">Doughnut Chart</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="chart-wrapper">
+                    <canvas id="financialChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div id="expenseMineArea" class="summary-view-area" style="display: none;">
+                <div class="chart-container">
+                  <div class="chart-header">
+                    <h3 class="section-title">🍰 My Expense Breakdown</h3>
+                    <div class="chart-controls">
+                      <select id="expenseChartType" class="chart-select">
+                        <option value="bar">Bar Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="doughnut">Doughnut Chart</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="chart-wrapper">
+                    <canvas id="expenseChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div id="expensePersonArea" class="summary-view-area" style="display: none;">
+                <div id="personwiseList">
+                  <!-- Dynamic Content -->
+                </div>
+                <div class="chart-container" id="allPeopleChartContainer">
+                  <div class="chart-header">
+                    <h3 class="section-title">👥 All People Expense Summary</h3>
+                    <div class="chart-controls">
+                      <select id="allPeopleChartType" class="chart-select">
+                        <option value="bar">Bar Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="doughnut">Doughnut Chart</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="chart-wrapper" style="height: 400px;">
+                    <canvas id="allPeopleChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PEOPLE TAB -->
+          <div id="peopleTab" class="tab-content" style="display: none;">
+            <div id="peopleBackBtnContainer" style="display: none; margin-bottom: 20px;">
+              <button class="btn btn-secondary" onclick="setPeopleView('none')"
+                style="width: auto; padding: 10px 20px;">
+                <i class="fas fa-arrow-left"></i> Back to People Overview
+              </button>
+            </div>
+
+            <div class="stats-grid" id="peopleStatsGrid">
+              <div class="stat-card clickable" id="cardReceived" onclick="setPeopleView('received')">
+                <div class="stat-label">Total Received</div>
+                <div class="stat-value expense" id="totalPeopleReceived">0.00</div>
+              </div>
+              <div class="stat-card clickable" id="cardGiven" onclick="setPeopleView('given')">
+                <div class="stat-label">Total Given</div>
+                <div class="stat-value income" id="totalPeoplePaid">0.00</div>
+              </div>
+              <div class="stat-card clickable" id="cardBalance" onclick="setPeopleView('balance')">
+                <div class="stat-label" id="peopleStatusLabel">People Balance</div>
+                <div class="stat-value balance" id="totalPeopleBalance">0.00</div>
+              </div>
+            </div>
+
+            <!-- Total Received Chart -->
+            <div class="chart-container" id="receivedChartArea" style="display: none;">
+              <div class="chart-header">
+                <h3 class="section-title">🔴 Total Received Analysis</h3>
+                <div class="chart-controls">
+                  <select id="receivedAllChartType" class="chart-select">
+                    <option value="bar">Bar Chart</option>
+                    <option value="pie">Pie Chart</option>
+                    <option value="doughnut">Doughnut Chart</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="receivedAllChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Total Given Chart -->
+            <div class="chart-container" id="givenChartArea" style="display: none;">
+              <div class="chart-header">
+                <h3 class="section-title">� Total Given Analysis</h3>
+                <div class="chart-controls">
+                  <select id="givenAllChartType" class="chart-select">
+                    <option value="bar">Bar Chart</option>
+                    <option value="pie">Pie Chart</option>
+                    <option value="doughnut">Doughnut Chart</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="givenAllChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Balance / Have to Pay Charts -->
+            <div id="balanceChartsArea" style="display: none;">
+              <div class="chart-container">
+                <div class="chart-header">
+                  <h3 class="section-title">�🔴 Have to Pay To</h3>
+                  <div class="chart-controls">
+                    <select id="haveToPayChartType" class="chart-select">
+                      <option value="bar">Bar Chart</option>
+                      <option value="pie">Pie Chart</option>
+                      <option value="doughnut">Doughnut Chart</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="haveToPayChart"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-container">
+                <div class="chart-header">
+                  <h3 class="section-title">🟢 Will Receive From</h3>
+                  <div class="chart-controls">
+                    <select id="willReceiveChartType" class="chart-select">
+                      <option value="bar">Bar Chart</option>
+                      <option value="pie">Pie Chart</option>
+                      <option value="doughnut">Doughnut Chart</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="willReceiveChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADD TRANSACTION TAB -->
+          <div id="transactionsTab" class="tab-content" style="display: none;">
+            <div class="transaction-section">
+              <h3 class="section-title">💰 Add Income</h3>
+              <form id="incomeForm">
+                <div class="form-grid">
+                  <input type="number" id="incomeAmount" placeholder="Amount" step="0.01" required>
+                  <div class="date-input-wrapper">
+                    <input type="date" id="incomeDate" required>
+                    <span class="date-lock-icon" title="Month/Year locked to selected month"><i
+                        class="fas fa-lock"></i></span>
+                  </div>
+                  <select id="incomeCategory" required>
+                    <option value="">Category</option>
+                    <option value="Salary">💼 Salary</option>
+                    <option value="Business Income">🏢 Business Income</option>
+                    <option value="Freelancing">💻 Freelancing</option>
+                    <option value="Part-Time Job">⏱️ Part-Time Job</option>
+                    <option value="Tuition">📚 Tuition</option>
+                    <option value="Bonus">💰 Bonus</option>
+                    <option value="Overtime">⏲️ Overtime</option>
+                    <option value="Investment Profit">📈 Investment Profit</option>
+                    <option value="Interest">🏦 Interest (Bank/Deposit)</option>
+                    <option value="Rental Income">🏠 Rental Income</option>
+                    <option value="Gift Received">🎁 Gift Received</option>
+                    <option value="Scholarship">🎓 Scholarship</option>
+                    <option value="Others">📌 Others</option>
+                  </select>
+                  <input type="text" id="incomeNote" placeholder="Note (optional)">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Income</button>
+              </form>
+            </div>
+
+            <div class="transaction-section">
+              <h3 class="section-title">💸 Add Expense</h3>
+              <form id="expenseForm">
+                <div class="form-grid">
+                  <input type="number" id="expenseAmount" placeholder="Amount" step="0.01" required>
+                  <div class="date-input-wrapper">
+                    <input type="date" id="expenseDate" required>
+                    <span class="date-lock-icon" title="Month/Year locked to selected month"><i
+                        class="fas fa-lock"></i></span>
+                  </div>
+                  <select id="expenseCategory" required>
+                    <option value="">Category</option>
+                    <option value="Rent">🏠 Rent</option>
+                    <option value="Food & Groceries">🛒 Food & Groceries</option>
+                    <option value="Transport">🚗 Transport</option>
+                    <option value="Utilities">⚡ Utilities</option>
+                    <option value="Education">🎓 Education</option>
+                    <option value="Health">🏥 Health</option>
+                    <option value="Shopping">🛍️ Shopping</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Family">👨‍👩‍👧‍👦 Family</option>
+                    <option value="Gifts & Donations">🎁 Gifts & Donations</option>
+                    <option value="Personal Care">💅 Personal Care</option>
+                    <option value="Others">📌 Others</option>
+                  </select>
+                  <input type="text" id="expensePerson" placeholder="Person Name (optional)">
+                  <select id="expenseRelation">
+                    <option value="">Relation (optional)</option>
+                    <option value="Family">👨‍👩‍👧‍👦 Family</option>
+                    <option value="Friend">🤝 Friend</option>
+                    <option value="Colleague">💼 Colleague</option>
+                    <option value="Relative">🏠 Relative</option>
+                    <option value="Partner">💖 Partner</option>
+                    <option value="Others">📌 Others</option>
+                  </select>
+                  <input type="text" id="expenseNote" placeholder="Note (optional)">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Expense</button>
+              </form>
+            </div>
+
+            <div class="transaction-section">
+              <h3 class="section-title">👥 Money with People</h3>
+              <form id="peopleForm">
+                <div class="form-grid">
+                  <input type="text" id="personName" placeholder="Person Name" required>
+                  <input type="number" id="personAmount" placeholder="Amount" step="0.01" required>
+                  <div class="date-input-wrapper">
+                    <input type="date" id="personDate" required>
+                    <span class="date-lock-icon" title="Month/Year locked to selected month"><i
+                        class="fas fa-lock"></i></span>
+                  </div>
+                  <select id="personType" required>
+                    <option value="">Select Type</option>
+                    <option value="Received">Received</option>
+                    <option value="Paid">Given</option>
+                  </select>
+                  <input type="text" id="personNote" placeholder="Note (optional)">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Transaction</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- HISTORY TAB -->
+          <div id="historyTab" class="tab-content" style="display: none;">
+            <div class="transactions-list">
+              <div class="history-filter-tabs">
+                <button class="history-tab btn active" data-history="personal">My Transactions</button>
+                <button class="history-tab btn" data-history="people">People Transactions</button>
+              </div>
+              <div id="personalHistory" class="history-view active"></div>
+              <div id="peopleHistory" class="history-view"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS SECTION -->
+      <div id="settingsSection" class="section-content" style="display: none;">
+        <div class="settings-group">
+          <h3 class="section-title">⚙️ Profile Settings</h3>
+          <form id="updateProfileForm">
+            <div class="form-group">
+              <label>📝 Change Name:</label>
+              <input type="text" id="updateName" placeholder="New name">
+            </div>
+            <div class="form-group">
+              <label>🔐 Change Password:</label>
+              <input type="password" id="updatePass" placeholder="New password">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+          </form>
+        </div>
+
+        <div class="settings-group">
+          <h3 class="section-title">💱 Currency Settings</h3>
+          <form id="updateCurrencyForm">
+            <div class="form-group">
+              <label>💵 Preferred Currency:</label>
+              <select id="updateCurrencySelect">
+                <option value="৳">🇧🇩 BDT (Bangladeshi Taka)</option>
+                <option value="$">🇺🇸 USD (US Dollar)</option>
+                <option value="€">🇪🇺 EUR (Euro)</option>
+                <option value="£">🇬🇧 GBP (British Pound)</option>
+                <option value="₹">🇮🇳 INR (Indian Rupee)</option>
+                <option value="¥">🇯🇵 JPY (Japanese Yen)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Currency</button>
+          </form>
+        </div>
+
+        <div class="settings-group">
+          <h3 class="section-title">⚠️ Data Management</h3>
+          <button class="btn btn-secondary" onclick="logout()">Logout</button>
+          <button class="btn btn-danger" onclick="clearAllData()" style="margin-top: 10px;">Clear All Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING ACTION BUTTON -->
+  <div id="fab" class="fab">
+    <i class="fas fa-plus"></i>
+  </div>
+
+  <!-- ADD MONTH MODAL -->
+  <div id="addMonthModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">📅 Add New Month</h3>
+      <p class="modal-message">Select a month and year to create a record.</p>
+      <form id="addMonthForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Month:</label>
+            <select id="newMonthSelect" required>
+              <option value="0">January</option>
+              <option value="1">February</option>
+              <option value="2">March</option>
+              <option value="3">April</option>
+              <option value="4">May</option>
+              <option value="5">June</option>
+              <option value="6">July</option>
+              <option value="7">August</option>
+              <option value="8">September</option>
+              <option value="9">October</option>
+              <option value="10">November</option>
+              <option value="11">December</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Year:</label>
+            <input type="number" id="newYearInput" min="2000" max="2100" required>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeMonthModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Month</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BEAUTIFUL CUSTOM MODAL -->
+  <div id="customModal" class="modal">
+    <div class="modal-content">
+      <div id="modalIcon" class="modal-icon">⚠️</div>
+      <h3 id="modalTitle" class="modal-title">Confirm Action</h3>
+      <p id="modalMessage" class="modal-message">Are you sure you want to proceed?</p>
+      <div class="modal-actions">
+        <button id="modalCancelBtn" class="btn btn-secondary">Cancel</button>
+        <button id="modalConfirmBtn" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT TRANSACTION MODAL -->
+  <div id="editModal" class="modal">
+    <div class="modal-content" style="text-align: left;">
+      <h3 class="modal-title" style="text-align: center; margin-bottom: 25px;">✏️ Edit Transaction</h3>
+      <input type="hidden" id="editTxIndex">
+
+      <div class="form-group" id="editPersonGroup">
+        <label>Name / Person:</label>
+        <input type="text" id="editTxPerson">
+      </div>
+
+      <div class="form-group" id="editCategoryGroup">
+        <label>Category:</label>
+        <input type="text" id="editTxCategory">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Amount:</label>
+          <input type="number" id="editTxAmount" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Date:</label>
+          <input type="date" id="editTxDate">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Note / Description:</label>
+        <textarea id="editTxNote" rows="2"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEditedTx()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
